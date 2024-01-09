@@ -26,6 +26,8 @@ function App() {
   const [endDate, setEndDate] = useState(lastDay);
   const [view, setView] = useState(null);
 
+  console.log("s", startDate, "l", endDate);
+
   const handleChangeEvent = (events) => {
     const event = events.event;
     const idChanged = event.id;
@@ -149,22 +151,18 @@ function App() {
             <strong>Draggable Events</strong>
           </p>
 
-          <div className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-            <div className="fc-event-main">My Event 1</div>
-          </div>
-          <div className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-            <div className="fc-event-main">My Event 2</div>
-          </div>
-          <div className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-            <div className="fc-event-main">My Event 3</div>
-          </div>
-          <div className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-            <div className="fc-event-main">My Event 4</div>
-          </div>
-          <div className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
-            <div className="fc-event-main">My Event 5</div>
-          </div>
-
+          {Array.from({ length: 5 }, (_, index) => (
+            <div
+              key={`${index}`}
+              style={{
+                padding: "5px",
+                marginBottom: "5px",
+              }}
+              className="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event"
+            >
+              <div className="fc-event-main">My Event {index + 1}</div>
+            </div>
+          ))}
           <p>
             <input type="checkbox" id="drop-remove" />
             <label htmlFor="drop-remove">remove after drop</label>

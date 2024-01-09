@@ -43,11 +43,11 @@ export function getFirstAndLastDay(day, type) {
   let firstDay;
   let lastDay;
   if (type === "timeGridWeek" || type === "timeGridTwoWeek") {
-    const first = date.getDate() - date.getDay(); // First day is the day of the month - the day of the week
-    const last = first + (type === "timeGridTwoWeek" ? 13 : 6); // last day is the first day + 6
-    console.log(first, last, type);
+    const first = date.getDate() - date.getDay();
+    const last = first + (type === "timeGridTwoWeek" ? 13 : 6);
     firstDay = new Date(date.setDate(first));
     lastDay = new Date(date.setDate(last));
+    if (first <= 0) lastDay = new Date(date.setMonth(date.getMonth() + 1));
   } else {
     firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
