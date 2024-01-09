@@ -26,8 +26,6 @@ function App() {
   const [endDate, setEndDate] = useState(lastDay);
   const [view, setView] = useState(null);
 
-  console.log("s", startDate, "l", endDate);
-
   const handleChangeEvent = (events) => {
     const event = events.event;
     const idChanged = event.id;
@@ -46,6 +44,7 @@ function App() {
     });
     setCurrenEvent(eventsData);
   };
+
   const handleRemoveEvent = (clickInfo) => {
     if (
       window.confirm(
@@ -55,6 +54,7 @@ function App() {
       clickInfo.event.remove();
     }
   };
+
   const handleAddEvent = (selectInfo) => {
     let title = window.prompt("Please enter a new title for your event");
     let calendarApi = selectInfo.view.calendar;
@@ -83,6 +83,7 @@ function App() {
       handleChangeAllTime(view, date);
     }
   };
+
   const handleChangeView = (e) => {
     const viewType = e.view.type;
     handleChangeAllTime(viewType, focusDate);
@@ -202,7 +203,6 @@ function App() {
           themeSystem="Simplex"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           droppable
-          // initialEvents={INITIAL_EVENTS}
           events={currenEvent}
           editable
           selectable
@@ -211,7 +211,7 @@ function App() {
           weekends
           eventChange={handleChangeEvent}
           eventDrop={handleChangeEvent}
-          handleEventClick={handleRemoveEvent}
+          eventClick={handleRemoveEvent}
           select={handleAddEvent}
           datesSet={handleChangeView}
           drop={handleEventRecieve}
