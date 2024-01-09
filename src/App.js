@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-// import { formatDate } from '@fullcalendar/core'
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -10,8 +9,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./App.css";
 import {
   INITIAL_EVENTS,
+  OPTION_VIEWS,
   createEventId,
   getFirstAndLastDay,
+  handleNextOrPrevDate,
   randomColor,
 } from "./helper";
 
@@ -25,6 +26,31 @@ function App() {
   const [startDate, setStartDate] = useState(firstDay);
   const [endDate, setEndDate] = useState(lastDay);
   const [view, setView] = useState(null);
+
+  function isEventOverDiv(x, y) {
+    const externalEvents = document.getElementById("external-events");
+    const rect = externalEvents.getBoundingClientRect();
+
+    return (
+      x >= rect.left && y >= rect.top && x <= rect.right && y <= rect.bottom
+    );
+  }
+
+  const handleOnNextOrPrev = (type) => {
+    if (type === "next") {
+      fullcalendarRef.current.calendar.next();
+    } else {
+      fullcalendarRef.current.calendar.prev();
+    }
+    const { fdResult, ldResult } = handleNextOrPrevDate(
+      view,
+      startDate,
+      endDate,
+      type
+    );
+    setStartDate(fdResult);
+    setEndDate(ldResult);
+  };
 
   const handleChangeEvent = (events) => {
     const event = events.event;
@@ -76,34 +102,45 @@ function App() {
   };
 
   const handleChangeTime = (date) => {
-    let calendarApi = fullcalendarRef.current.getApi();
+    const calendarApi = fullcalendarRef.current.getApi();
     if (calendarApi) {
-      calendarApi.gotoDate(date);
-      setFocusDate(date);
-      handleChangeAllTime(view, date);
+      const dataDate = Array.isArray(date) ? date[0] : date;
+      setFocusDate(dataDate);
+
+      const isTimeGridDay = view === "timeGridDay";
+      calendarApi.gotoDate(
+        isTimeGridDay
+          ? dataDate
+          : getFirstAndLastDay(new Date(dataDate), view).firstDay
+      );
+      setStartDate(
+        isTimeGridDay
+          ? dataDate
+          : getFirstAndLastDay(new Date(dataDate), view).firstDay
+      );
+      setEndDate(
+        isTimeGridDay
+          ? dataDate
+          : getFirstAndLastDay(new Date(dataDate), view).lastDay
+      );
     }
   };
 
-  const handleChangeView = (e) => {
-    const viewType = e.view.type;
-    handleChangeAllTime(viewType, focusDate);
-    setView(viewType);
-  };
-
-  const handleChangeAllTime = (v, fcd) => {
-    if (v !== "timeGridDay") {
-      const objDate = getFirstAndLastDay(new Date(fcd), v);
+  const handleChangeView = (viewType) => {
+    const typeOfView = viewType.target.value;
+    fullcalendarRef.current.calendar.changeView(typeOfView);
+    if (typeOfView !== "timeGridDay") {
+      const objDate = getFirstAndLastDay(new Date(focusDate), typeOfView);
       setStartDate(objDate.firstDay);
       setEndDate(objDate.lastDay);
     } else {
-      setStartDate(fcd);
-      setEndDate(fcd);
+      setStartDate(focusDate);
+      setEndDate(focusDate);
     }
+    setView(typeOfView);
   };
 
   const handleEventRecieve = (info) => {
-    console.log("info", info);
-    var checkbox = document.getElementById("drop-remove");
     setCurrenEvent([
       ...currenEvent,
       {
@@ -114,8 +151,25 @@ function App() {
         color: randomColor(),
       },
     ]);
-    if (checkbox.checked) {
-      info.draggedEl.style.display = "none";
+    info.draggedEl.style.display = "none";
+  };
+
+  const handleDragStop = (event) => {
+    if (isEventOverDiv(event.jsEvent.clientX, event.jsEvent.clientY)) {
+      const evId = event.event.id;
+      let listEvent = [...currenEvent];
+      const index = listEvent.findIndex((event) => event.id === evId);
+      if (index !== -1) {
+        listEvent.splice(index, 1);
+        const list = document.getElementById("external-events");
+        list.insertAdjacentHTML(
+          "afterbegin",
+          `<div style="padding: 5px; margin-bottom: 5px;" class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
+          <div class="fc-event-main">${event.event.title}</div>
+        </div>`
+        );
+        setCurrenEvent(listEvent);
+      }
     }
   };
 
@@ -124,7 +178,6 @@ function App() {
     new Draggable(draggableEl, {
       itemSelector: ".fc-event",
       eventData: function (eventEl) {
-        console.log("eventEl", eventEl);
         return {
           title: eventEl.innerText,
           create: false,
@@ -145,13 +198,17 @@ function App() {
       <div
         style={{
           width: "20%",
+          minHeight: "100px",
         }}
       >
-        <div id="external-events">
-          <p>
-            <strong>Draggable Events</strong>
-          </p>
-
+        <div
+          id="external-events"
+          style={{
+            minHeight: "100px",
+            border: "1px solid green",
+            padding: "5px",
+          }}
+        >
           {Array.from({ length: 5 }, (_, index) => (
             <div
               key={`${index}`}
@@ -164,20 +221,36 @@ function App() {
               <div className="fc-event-main">My Event {index + 1}</div>
             </div>
           ))}
-          <p>
-            <input type="checkbox" id="drop-remove" />
-            <label htmlFor="drop-remove">remove after drop</label>
-          </p>
         </div>
         <div>
           Date:{" "}
           <DatePicker
-            placeholderText="Time"
             selected={startDate}
             onChange={handleChangeTime}
+            selectsRange={view !== "timeGridDay"}
             startDate={startDate}
             endDate={endDate}
           />
+        </div>
+        <div>
+          {" "}
+          Type views:{" "}
+          <select onChange={handleChangeView}>
+            {OPTION_VIEWS.map((item, index) => (
+              <option key={index} value={item.type}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          Button Next and Prev :{" "}
+          <button type="button" onClick={() => handleOnNextOrPrev("prev")}>
+            Prev
+          </button>
+          <button type="button" onClick={() => handleOnNextOrPrev("next")}>
+            Next
+          </button>
         </div>
       </div>
       <div
@@ -188,17 +261,36 @@ function App() {
         <FullCalendar
           initialView="dayGridMonth"
           headerToolbar={{
-            left: "prev,next",
+            left: "",
             center: "title",
-            right: "dayGridMonth,timeGridTwoWeek,timeGridWeek,timeGridDay",
+            right: "",
           }}
           views={{
             timeGridTwoWeek: {
               type: "timeGrid",
               duration: { days: 14 },
-              buttonText: "2 Week",
+              buttonText: "2 Weeks",
+            },
+            timeGridThreeDay: {
+              type: "timeGrid",
+              duration: { days: 3 },
+              buttonText: "3 days",
+            },
+            timeGridTwoDay: {
+              type: "timeGrid",
+              duration: { days: 2 },
+              buttonText: "2 days",
             },
           }}
+          // customButtons={{
+          //   dropdownCustomView: {
+          //     text: "Choose View",
+          //     className: "fc-custom-view-dropdown",
+          //     click: () => {
+          //       // Trigger dropdown visibility here
+          //     },
+          //   },
+          // }}
           ref={fullcalendarRef}
           themeSystem="Simplex"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -208,13 +300,14 @@ function App() {
           selectable
           // selectMirror
           dayMaxEvents
+          dragRevertDuration={0}
           weekends
           eventChange={handleChangeEvent}
           eventDrop={handleChangeEvent}
           eventClick={handleRemoveEvent}
           select={handleAddEvent}
-          datesSet={handleChangeView}
           drop={handleEventRecieve}
+          eventDragStop={handleDragStop}
         />
       </div>
     </div>
