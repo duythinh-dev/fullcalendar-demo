@@ -15,50 +15,50 @@ export const OPTION_VIEWS = [
   {
     type: "timeGridDay",
     title: "Day",
-    plustDate: 1,
+    plusDate: 1,
   },
   {
     type: "timeGridTwoWeek",
     title: "Two weeks",
-    plustDate: 13,
+    plusDate: 13,
   },
   {
     type: "timeGridThreeWeek",
     title: "Three weeks",
-    plustDate: 20,
+    plusDate: 20,
   },
   {
     type: "timeGridFourWeek",
     title: "Four weeks",
-    plustDate: 27,
+    plusDate: 27,
   },
   {
     type: "timeGridWeek",
     title: "Week",
-    plustDate: 6,
+    plusDate: 6,
   },
   {
     type: "dayGridMonth",
     title: "Month",
-    plustDate: 0,
+    plusDate: 0,
   },
   {
     type: "timeGridThreeDay",
     title: "Three Days Rolling",
-    plustDate: 2,
+    plusDate: 2,
   },
   {
     type: "timeGridFourDay",
     title: "Four Days Rolling",
-    plustDate: 3,
+    plusDate: 3,
   },
 ];
 
-function randomDate(start, end) {
+const randomDate = (start, end) => {
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime())
   );
-}
+};
 
 export const INITIAL_EVENTS = Array.apply(null, { length: 100 }).map(
   (_, index) => {
@@ -72,20 +72,20 @@ export const INITIAL_EVENTS = Array.apply(null, { length: 100 }).map(
   }
 );
 
-export function createEventId() {
+export const createEventId = () => {
   return String(eventGuid++);
-}
+};
 
-export function randomColor() {
+export const randomColor = () => {
   const idxRandom = Math.floor(Math.random() * OPTION_COLORS.length);
   return OPTION_COLORS[idxRandom];
-}
+};
 
-export function getFirstAndLastDay(day, type) {
+export const getFirstAndLastDay = (day, type) => {
   const date = new Date(day);
   let firstDay;
   let lastDay;
-  let plusDay = OPTION_VIEWS.find((item) => item.type === type)?.plustDate;
+  let plusDay = OPTION_VIEWS.find((item) => item.type === type)?.plusDate;
 
   if (
     [
@@ -116,14 +116,14 @@ export function getFirstAndLastDay(day, type) {
     firstDay,
     lastDay,
   };
-}
+};
 
-export function getSunday(d) {
+export const getSunday = (d) => {
   d = new Date(d);
-  var day = d.getDay(),
+  const day = d.getDay(),
     diff = d.getDate() - day + (day == 0 ? -6 : 0);
   return new Date(d.setDate(diff));
-}
+};
 
 const addDayToDate = (dateObj, numberOfWeeks, action) => {
   dateObj.setDate(

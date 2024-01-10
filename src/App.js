@@ -22,38 +22,43 @@ function App() {
 
   const { firstDay, lastDay } = getFirstAndLastDay(new Date(), "dayGridMonth");
 
-  const [currenEvent, setCurrenEvent] = useState(INITIAL_EVENTS);
-  const [focusDate, setFocusDate] = useState(new Date());
-  const [startDate, setStartDate] = useState(firstDay);
-  const [endDate, setEndDate] = useState(lastDay);
-  const [view, setView] = useState(null);
+  const [state, setState] = useState({
+    currentEvent: INITIAL_EVENTS,
+    focusDate: new Date(),
+    startDate: firstDay,
+    endDate: lastDay,
+    view: null,
+  });
 
-  function isEventOverDiv(x, y) {
+  const isEventOverDiv = (x, y) => {
     const externalEvents = document.getElementById("external-events");
     const rect = externalEvents.getBoundingClientRect();
 
     return (
       x >= rect.left && y >= rect.top && x <= rect.right && y <= rect.bottom
     );
-  }
+  };
 
   const handleOnNextOrPrev = (type) => {
     const { fdResult, ldResult } = handleNextOrPrevDate(
-      view,
-      startDate,
-      endDate,
+      state.view,
+      state.startDate,
+      state.endDate,
       type
     );
     fullcalendarRef.current.getApi().gotoDate(fdResult);
-    setStartDate(fdResult);
-    setEndDate(ldResult);
-    setFocusDate(fdResult);
+    setState({
+      ...state,
+      startDate: fdResult,
+      endDate: ldResult,
+      focusDate: fdResult,
+    });
   };
 
   const handleChangeEvent = (events) => {
     const event = events.event;
     const idChanged = event.id;
-    const eventsData = currenEvent.map((e) => {
+    const eventsData = state.currentEvent.map((e) => {
       if (e.id === idChanged) {
         return {
           id: event.id,
@@ -66,7 +71,7 @@ function App() {
       }
       return e;
     });
-    setCurrenEvent(eventsData);
+    setState({ ...state, currentEvent: eventsData });
   };
 
   const handleRemoveEvent = (clickInfo) => {
@@ -75,7 +80,10 @@ function App() {
         `Are you sure you want to delete the event '${clickInfo.event.title}'`
       )
     ) {
-      setCurrenEvent(removeItemFromArr(currenEvent, clickInfo.event.id));
+      setState({
+        ...state,
+        currentEvent: removeItemFromArr(state.currentEvent, clickInfo.event.id),
+      });
       clickInfo.event.remove();
     }
   };
@@ -86,17 +94,20 @@ function App() {
 
     calendarApi.unselect(); // clear date selection
     if (title) {
-      setCurrenEvent([
-        ...currenEvent,
-        {
-          id: createEventId(),
-          title,
-          start: selectInfo.startStr,
-          end: selectInfo.endStr,
-          allDay: selectInfo.allDay,
-          color: randomColor(),
-        },
-      ]);
+      setState({
+        ...state,
+        currentEvent: [
+          ...state.currentEvent,
+          {
+            id: createEventId(),
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay,
+            color: randomColor(),
+          },
+        ],
+      });
     }
   };
 
@@ -104,52 +115,60 @@ function App() {
     const calendarApi = fullcalendarRef.current.getApi();
     if (calendarApi) {
       const dataDate = Array.isArray(date) ? date[0] : date;
-      setFocusDate(dataDate);
 
-      const isTimeGridDay = view === "timeGridDay";
-      calendarApi.gotoDate(
-        isTimeGridDay
-          ? dataDate
-          : getFirstAndLastDay(new Date(dataDate), view).firstDay
-      );
-      setStartDate(
-        isTimeGridDay
-          ? dataDate
-          : getFirstAndLastDay(new Date(dataDate), view).firstDay
-      );
-      setEndDate(
-        isTimeGridDay
-          ? dataDate
-          : getFirstAndLastDay(new Date(dataDate), view).lastDay
-      );
+      const isTimeGridDay = state.view === "timeGridDay";
+      const objDate = getFirstAndLastDay(new Date(dataDate), state.view);
+      const fd = isTimeGridDay ? dataDate : objDate.firstDay;
+      const ld = isTimeGridDay
+        ? dataDate
+        : getFirstAndLastDay(new Date(dataDate), state.view).lastDay;
+      calendarApi.gotoDate(fd);
+
+      setState({
+        ...state,
+        startDate: fd,
+        endDate: ld,
+        focusDate: dataDate,
+      });
     }
   };
 
   const handleChangeView = (viewType) => {
     const typeOfView = viewType.target.value;
     fullcalendarRef.current.calendar.changeView(typeOfView);
+    let fdResult;
+    let ldResult;
     if (typeOfView !== "timeGridDay") {
-      const objDate = getFirstAndLastDay(new Date(focusDate), typeOfView);
-      setStartDate(objDate.firstDay);
-      setEndDate(objDate.lastDay);
+      const objDate = getFirstAndLastDay(new Date(state.focusDate), typeOfView);
+
+      fdResult = objDate.firstDay;
+      ldResult = objDate.lastDay;
     } else {
-      setStartDate(focusDate);
-      setEndDate(focusDate);
+      fdResult = state.focusDate;
+      ldResult = state.focusDate;
     }
-    setView(typeOfView);
+    setState({
+      ...state,
+      startDate: fdResult,
+      endDate: ldResult,
+      view: typeOfView,
+    });
   };
 
   const handleEventRecieve = (info) => {
-    setCurrenEvent([
-      ...currenEvent,
-      {
-        id: createEventId(),
-        title: info.draggedEl.textContent,
-        start: info.date,
-        allDay: !!info.allDay,
-        color: randomColor(),
-      },
-    ]);
+    setState({
+      ...state,
+      currentEvent: [
+        ...state.currentEvent,
+        {
+          id: createEventId(),
+          title: info.draggedEl.textContent,
+          start: info.date,
+          allDay: !!info.allDay,
+          color: randomColor(),
+        },
+      ],
+    });
     info.draggedEl.style.display = "none";
   };
 
@@ -163,7 +182,10 @@ function App() {
           <div class="fc-event-main">${event.event.title}</div>
         </div>`
       );
-      setCurrenEvent(removeItemFromArr(currenEvent, evId));
+      setState({
+        ...state,
+        currentEvent: removeItemFromArr(state.currentEvent, evId),
+      });
     }
   };
 
@@ -248,11 +270,11 @@ function App() {
           }}
         >
           <DatePicker
-            selected={startDate}
+            selected={state.startDate}
             onChange={handleChangeTime}
-            selectsRange={view !== "timeGridDay"}
-            startDate={startDate}
-            endDate={endDate}
+            selectsRange={state.view !== "timeGridDay"}
+            startDate={state.startDate}
+            endDate={state.endDate}
             inline
           />
         </div>
@@ -296,23 +318,13 @@ function App() {
               buttonText: "4 days",
             },
           }}
-          // customButtons={{
-          //   dropdownCustomView: {
-          //     text: "Choose View",
-          //     className: "fc-custom-view-dropdown",
-          //     click: () => {
-          //       // Trigger dropdown visibility here
-          //     },
-          //   },
-          // }}
           ref={fullcalendarRef}
           themeSystem="Simplex"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           droppable
-          events={currenEvent}
+          events={state.currentEvent}
           editable
           selectable
-          // selectMirror
           dayMaxEvents
           dragRevertDuration={0}
           weekends
