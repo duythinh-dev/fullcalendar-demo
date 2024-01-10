@@ -38,11 +38,6 @@ function App() {
   }
 
   const handleOnNextOrPrev = (type) => {
-    // if (type === "next") {
-    //   fullcalendarRef.current.calendar.next();
-    // } else {
-    //   fullcalendarRef.current.calendar.prev();
-    // }
     const { fdResult, ldResult } = handleNextOrPrevDate(
       view,
       startDate,
