@@ -120,8 +120,8 @@ export const getFirstAndLastDay = (day, type) => {
 
 export const getSunday = (d) => {
   d = new Date(d);
-  const day = d.getDay(),
-    diff = d.getDate() - day + (day == 0 ? -6 : 0);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day == 0 ? -6 : 0);
   return new Date(d.setDate(diff));
 };
 
