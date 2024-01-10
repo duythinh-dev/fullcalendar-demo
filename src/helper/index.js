@@ -13,28 +13,43 @@ const OPTION_COLORS = [
 
 export const OPTION_VIEWS = [
   {
-    type: "dayGridMonth",
-    title: "Month",
+    type: "timeGridDay",
+    title: "Day",
+    plustDate: 1,
   },
   {
     type: "timeGridTwoWeek",
     title: "Two weeks",
+    plustDate: 13,
+  },
+  {
+    type: "timeGridThreeWeek",
+    title: "Three weeks",
+    plustDate: 20,
+  },
+  {
+    type: "timeGridFourWeek",
+    title: "Four weeks",
+    plustDate: 27,
   },
   {
     type: "timeGridWeek",
     title: "Week",
+    plustDate: 6,
+  },
+  {
+    type: "dayGridMonth",
+    title: "Month",
   },
   {
     type: "timeGridThreeDay",
-    title: "Three days",
+    title: "Three Days Rolling",
+    plustDate: 2,
   },
   {
-    type: "timeGridTwoDay",
-    title: "Two days",
-  },
-  {
-    type: "timeGridDay",
-    title: "Day",
+    type: "timeGridFourDay",
+    title: "Four Days Rolling",
+    plustDate: 3,
   },
 ];
 
@@ -69,16 +84,25 @@ export function getFirstAndLastDay(day, type) {
   const date = new Date(day);
   let firstDay;
   let lastDay;
-  if (type === "timeGridWeek" || type === "timeGridTwoWeek") {
+  let plusDay = OPTION_VIEWS.find((item) => item.type === type).plustDate;
+
+  if (
+    [
+      "timeGridWeek",
+      "timeGridTwoWeek",
+      "timeGridThreeWeek",
+      "timeGridFourWeek",
+    ].includes(type)
+  ) {
     const first = date.getDate() - date.getDay();
-    const last = first + (type === "timeGridTwoWeek" ? 13 : 6);
+    const last = first + plusDay;
 
     firstDay = new Date(date.setDate(first));
     lastDay = new Date(date.setDate(last));
     if (first <= 0) lastDay = new Date(date.setMonth(date.getMonth() + 1));
-  } else if (type === "timeGridThreeDay" || type === "timeGridTwoDay") {
+  } else if (type === "timeGridThreeDay" || type === "timeGridFourDay") {
     const first = date.getDate();
-    const last = first + (type === "timeGridThreeDay" ? 2 : 1);
+    const last = first + plusDay;
 
     firstDay = new Date(date.setDate(first));
     lastDay = new Date(date.setDate(last));
@@ -132,9 +156,9 @@ export const handleNextOrPrevDate = (type, fd, ld, action) => {
       fdResult = addDayToDate(firstDay, 1, action);
       ldResult = addDayToDate(lastDay, 1, action);
       break;
-    case "timeGridTwoDay":
-      fdResult = addDayToDate(firstDay, 2, action);
-      ldResult = addDayToDate(lastDay, 2, action);
+    case "timeGridFourDay":
+      fdResult = addDayToDate(firstDay, 4, action);
+      ldResult = addDayToDate(lastDay, 4, action);
       break;
     case "timeGridThreeDay":
       fdResult = addDayToDate(firstDay, 3, action);
@@ -142,6 +166,8 @@ export const handleNextOrPrevDate = (type, fd, ld, action) => {
       break;
     case "timeGridWeek":
     case "timeGridTwoWeek":
+    case "timeGridThreeWeek":
+    case "timeGridFourWeek":
       fdResult = addWeeksToDate(firstDay, 1, action);
       ldResult = addWeeksToDate(lastDay, 1, action);
       break;

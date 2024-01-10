@@ -221,7 +221,12 @@ function App() {
             </div>
           ))}
         </div>
-        <div>
+        <div
+          style={{
+            paddingBottom: "10px",
+            paddingTop: "10px",
+          }}
+        >
           Date:{" "}
           <DatePicker
             selected={startDate}
@@ -237,7 +242,11 @@ function App() {
           Type views:{" "}
           <select onChange={handleChangeView}>
             {OPTION_VIEWS.map((item, index) => (
-              <option key={index} value={item.type}>
+              <option
+                key={index}
+                value={item.type}
+                selected={item.type === "dayGridMonth" ? "selected" : ""}
+              >
                 {item.title}
               </option>
             ))}
@@ -271,15 +280,25 @@ function App() {
               duration: { weeks: 2 },
               buttonText: "2 Weeks",
             },
+            timeGridThreeWeek: {
+              type: "timeGrid",
+              duration: { weeks: 3 },
+              buttonText: "3 Weeks",
+            },
+            timeGridFourWeek: {
+              type: "timeGrid",
+              duration: { weeks: 4 },
+              buttonText: "4 Weeks",
+            },
             timeGridThreeDay: {
               type: "timeGrid",
               duration: { days: 3 },
               buttonText: "3 days",
             },
-            timeGridTwoDay: {
+            timeGridFourDay: {
               type: "timeGrid",
-              duration: { days: 2 },
-              buttonText: "2 days",
+              duration: { days: 4 },
+              buttonText: "4 days",
             },
           }}
           // customButtons={{
