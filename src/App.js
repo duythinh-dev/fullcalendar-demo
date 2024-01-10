@@ -18,7 +18,7 @@ import {
 } from "./helper";
 
 function App() {
-  const fullcalendarRef = useRef();
+  const fullCalendarRef = useRef();
 
   const { firstDay, lastDay } = getFirstAndLastDay(new Date(), "dayGridMonth");
 
@@ -46,7 +46,7 @@ function App() {
       state.endDate,
       type
     );
-    fullcalendarRef.current.getApi().gotoDate(fdResult);
+    fullCalendarRef.current.getApi().gotoDate(fdResult);
     setState({
       ...state,
       startDate: fdResult,
@@ -112,7 +112,7 @@ function App() {
   };
 
   const handleChangeTime = (date) => {
-    const calendarApi = fullcalendarRef.current.getApi();
+    const calendarApi = fullCalendarRef.current.getApi();
     if (calendarApi) {
       const dataDate = Array.isArray(date) ? date[0] : date;
 
@@ -135,7 +135,7 @@ function App() {
 
   const handleChangeView = (viewType) => {
     const typeOfView = viewType.target.value;
-    fullcalendarRef.current.calendar.changeView(typeOfView);
+    fullCalendarRef.current.calendar.changeView(typeOfView);
     let fdResult;
     let ldResult;
     if (typeOfView !== "timeGridDay") {
@@ -155,7 +155,7 @@ function App() {
     });
   };
 
-  const handleEventRecieve = (info) => {
+  const handleEventReceive = (info) => {
     setState({
       ...state,
       currentEvent: [
@@ -318,7 +318,7 @@ function App() {
               buttonText: "4 days",
             },
           }}
-          ref={fullcalendarRef}
+          ref={fullCalendarRef}
           themeSystem="Simplex"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           droppable
@@ -332,7 +332,7 @@ function App() {
           eventDrop={handleChangeEvent}
           eventClick={handleRemoveEvent}
           select={handleAddEvent}
-          drop={handleEventRecieve}
+          drop={handleEventReceive}
           eventDragStop={handleDragStop}
         />
       </div>
