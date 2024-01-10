@@ -14,6 +14,7 @@ import {
   getFirstAndLastDay,
   handleNextOrPrevDate,
   randomColor,
+  removeItemFromArr,
 } from "./helper";
 
 function App() {
@@ -37,19 +38,21 @@ function App() {
   }
 
   const handleOnNextOrPrev = (type) => {
-    if (type === "next") {
-      fullcalendarRef.current.calendar.next();
-    } else {
-      fullcalendarRef.current.calendar.prev();
-    }
+    // if (type === "next") {
+    //   fullcalendarRef.current.calendar.next();
+    // } else {
+    //   fullcalendarRef.current.calendar.prev();
+    // }
     const { fdResult, ldResult } = handleNextOrPrevDate(
       view,
       startDate,
       endDate,
       type
     );
+    fullcalendarRef.current.getApi().gotoDate(fdResult);
     setStartDate(fdResult);
     setEndDate(ldResult);
+    setFocusDate(fdResult);
   };
 
   const handleChangeEvent = (events) => {
@@ -77,6 +80,7 @@ function App() {
         `Are you sure you want to delete the event '${clickInfo.event.title}'`
       )
     ) {
+      setCurrenEvent(removeItemFromArr(currenEvent, clickInfo.event.id));
       clickInfo.event.remove();
     }
   };
@@ -157,19 +161,14 @@ function App() {
   const handleDragStop = (event) => {
     if (isEventOverDiv(event.jsEvent.clientX, event.jsEvent.clientY)) {
       const evId = event.event.id;
-      let listEvent = [...currenEvent];
-      const index = listEvent.findIndex((event) => event.id === evId);
-      if (index !== -1) {
-        listEvent.splice(index, 1);
-        const list = document.getElementById("external-events");
-        list.insertAdjacentHTML(
-          "afterbegin",
-          `<div style="padding: 5px; margin-bottom: 5px;" class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
+      const list = document.getElementById("external-events");
+      list.insertAdjacentHTML(
+        "afterbegin",
+        `<div style="padding: 5px; margin-bottom: 5px;" class="fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event">
           <div class="fc-event-main">${event.event.title}</div>
         </div>`
-        );
-        setCurrenEvent(listEvent);
-      }
+      );
+      setCurrenEvent(removeItemFromArr(currenEvent, evId));
     }
   };
 
@@ -230,6 +229,7 @@ function App() {
             selectsRange={view !== "timeGridDay"}
             startDate={startDate}
             endDate={endDate}
+            inline
           />
         </div>
         <div>
@@ -268,7 +268,7 @@ function App() {
           views={{
             timeGridTwoWeek: {
               type: "timeGrid",
-              duration: { days: 14 },
+              duration: { weeks: 2 },
               buttonText: "2 Weeks",
             },
             timeGridThreeDay: {

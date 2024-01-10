@@ -130,7 +130,7 @@ export const handleNextOrPrevDate = (type, fd, ld, action) => {
   switch (type) {
     case "timeGridDay":
       fdResult = addDayToDate(firstDay, 1, action);
-      ldResult = addDayToDate(firstDay, 1, action);
+      ldResult = addDayToDate(lastDay, 1, action);
       break;
     case "timeGridTwoDay":
       fdResult = addDayToDate(firstDay, 2, action);
@@ -141,25 +141,29 @@ export const handleNextOrPrevDate = (type, fd, ld, action) => {
       ldResult = addDayToDate(lastDay, 3, action);
       break;
     case "timeGridWeek":
+    case "timeGridTwoWeek":
       fdResult = addWeeksToDate(firstDay, 1, action);
       ldResult = addWeeksToDate(lastDay, 1, action);
-      break;
-    case "timeGridTwoWeek":
-      fdResult = addWeeksToDate(firstDay, 2, action);
-      ldResult = addWeeksToDate(lastDay, 2, action);
       break;
     case "dayGridMonth":
     default:
       fdResult =
         action === "next" ? addMonth(firstDay, 1) : addMonth(firstDay, -1);
-      ldResult = getFirstAndLastDay(
-        action === "next" ? addMonth(firstDay, 1) : addMonth(firstDay, -1),
-        "dayGridMonth"
-      ).lastDay;
+      ldResult = getFirstAndLastDay(fdResult, "dayGridMonth").lastDay;
       break;
   }
   return {
     fdResult,
     ldResult,
   };
+};
+
+export const removeItemFromArr = (arr, id) => {
+  let arrResult = [...arr];
+  const index = arrResult.findIndex((event) => event.id === id);
+  if (index !== -1) {
+    arrResult.splice(index, 1);
+    return arrResult;
+  }
+  return arr;
 };
