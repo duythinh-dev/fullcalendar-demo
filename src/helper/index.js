@@ -40,6 +40,7 @@ export const OPTION_VIEWS = [
   {
     type: "dayGridMonth",
     title: "Month",
+    plustDate: 0,
   },
   {
     type: "timeGridThreeDay",
@@ -84,7 +85,7 @@ export function getFirstAndLastDay(day, type) {
   const date = new Date(day);
   let firstDay;
   let lastDay;
-  let plusDay = OPTION_VIEWS.find((item) => item.type === type).plustDate;
+  let plusDay = OPTION_VIEWS.find((item) => item.type === type)?.plustDate;
 
   if (
     [

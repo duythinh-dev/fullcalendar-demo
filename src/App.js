@@ -221,22 +221,7 @@ function App() {
             </div>
           ))}
         </div>
-        <div
-          style={{
-            paddingBottom: "10px",
-            paddingTop: "10px",
-          }}
-        >
-          Date:{" "}
-          <DatePicker
-            selected={startDate}
-            onChange={handleChangeTime}
-            selectsRange={view !== "timeGridDay"}
-            startDate={startDate}
-            endDate={endDate}
-            inline
-          />
-        </div>
+
         <div>
           {" "}
           Type views:{" "}
@@ -260,6 +245,21 @@ function App() {
           <button type="button" onClick={() => handleOnNextOrPrev("next")}>
             Next
           </button>
+        </div>
+        <div
+          style={{
+            paddingBottom: "10px",
+            paddingTop: "10px",
+          }}
+        >
+          <DatePicker
+            selected={startDate}
+            onChange={handleChangeTime}
+            selectsRange={view !== "timeGridDay"}
+            startDate={startDate}
+            endDate={endDate}
+            inline
+          />
         </div>
       </div>
       <div
