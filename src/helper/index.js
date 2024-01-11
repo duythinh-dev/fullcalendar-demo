@@ -74,7 +74,7 @@ export const INITIAL_EVENTS = Array.apply(null, { length: 100 }).map(
       title: `Event ${index}`,
       start: randomDate(new Date(2024, 1, 1), new Date()),
       color: randomColor(),
-      allDay: index % 5 === 0 ? true : false,
+      allDay: index % 5 === 0,
     };
   }
 );
