@@ -137,13 +137,13 @@ const addWeeksToDate = (dateObj, numberOfWeeks, action) => {
   return dateObj;
 };
 
-function addMonth(date, amount) {
+const addMonth = (date, amount) => {
   const newDate = new Date(date.getTime());
 
   newDate.setMonth(newDate.getMonth() + amount);
 
   return newDate;
-}
+};
 
 export const handleNextOrPrevDate = (type, fd, ld, action) => {
   const firstDay = new Date(fd);
