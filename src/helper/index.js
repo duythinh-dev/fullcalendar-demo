@@ -53,7 +53,14 @@ export const OPTION_VIEWS = [
     plusDate: 3,
   },
 ];
+export const createEventId = () => {
+  return String(eventGuid++);
+};
 
+export const randomColor = () => {
+  const idxRandom = Math.floor(Math.random() * OPTION_COLORS.length);
+  return OPTION_COLORS[idxRandom];
+};
 const randomDate = (start, end) => {
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime())
@@ -71,15 +78,6 @@ export const INITIAL_EVENTS = Array.apply(null, { length: 100 }).map(
     };
   }
 );
-
-export const createEventId = () => {
-  return String(eventGuid++);
-};
-
-export const randomColor = () => {
-  const idxRandom = Math.floor(Math.random() * OPTION_COLORS.length);
-  return OPTION_COLORS[idxRandom];
-};
 
 export const getFirstAndLastDay = (day, type) => {
   const date = new Date(day);

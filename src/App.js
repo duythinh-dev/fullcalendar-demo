@@ -242,13 +242,9 @@ function App() {
         <div>
           {" "}
           Type views:{" "}
-          <select onChange={handleChangeView}>
+          <select onChange={handleChangeView} defaultValue="dayGridMonth">
             {OPTION_VIEWS.map((item, index) => (
-              <option
-                key={index}
-                value={item.type}
-                selected={item.type === "dayGridMonth" ? "selected" : ""}
-              >
+              <option key={index} value={item.type}>
                 {item.title}
               </option>
             ))}
