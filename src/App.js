@@ -119,9 +119,7 @@ function App() {
       const isTimeGridDay = state.view === "timeGridDay";
       const objDate = getFirstAndLastDay(new Date(dataDate), state.view);
       const fd = isTimeGridDay ? dataDate : objDate.firstDay;
-      const ld = isTimeGridDay
-        ? dataDate
-        : getFirstAndLastDay(new Date(dataDate), state.view).lastDay;
+      const ld = isTimeGridDay ? dataDate : objDate.lastDay;
       calendarApi.gotoDate(fd);
 
       setState({
