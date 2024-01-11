@@ -187,8 +187,8 @@ function App() {
   };
 
   useEffect(() => {
-    let draggableEl = document.getElementById("external-events");
-    new Draggable(draggableEl, {
+    const draggableEl = document.getElementById("external-events");
+    let DraggableNew = new Draggable(draggableEl, {
       itemSelector: ".fc-event",
       eventData: function (eventEl) {
         return {
@@ -197,6 +197,9 @@ function App() {
         };
       },
     });
+    return () => {
+      DraggableNew = null;
+    };
   }, []);
 
   return (
